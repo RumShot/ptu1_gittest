@@ -6,3 +6,4 @@ bandysim isaugoti  :)
 
 vienas
 du
+trys
