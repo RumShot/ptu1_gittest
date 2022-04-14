@@ -5,3 +5,4 @@ readme failo linkas [cia](https://github.com/adam-p/markdown-here/wiki/Markdown-
 bandysim isaugoti  :)
 
 vienas
+du
