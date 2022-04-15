@@ -1,9 +1,5 @@
 # ptu1_gittest
 
-random linkas [cia](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+Welcome link: [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ?autoplay=1)
 
-bandysim isaugoti  :)
-
-vienas
-du
-trys
+Home work database :)
