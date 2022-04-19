@@ -6,7 +6,7 @@ import json
 
 
 def model_search(search_model):
-    search_model_fixed = search_model.replace(" ", "+")
+    search_model_fixed = str(search_model).replace(" ", "+")
     main_url = "https://www.kaina24.lt/"
     super_link = main_url + "search?q=" + search_model_fixed
     request_data = requests.get(super_link, headers={"User-Agent": "Mozilla/5.0"})
@@ -41,17 +41,23 @@ def grab_and_scratch(soup):
         product_onclick = product_block("a", {"rel": "nofollow"})
         final_url = product_onclick[0].get("onclick")
         product_url = re.search("(?P<url>https?://[^\s]+)", final_url).group("url")
+        # name
+
+        # FIX ME HERE
+
+        named_text = product_block(text=True)
+        full_name = str(named_text).replace("\"", "inch").replace("<b>", "").replace("</b>", "").replace("/", "|")
         # print("Product URL: ", product_url)
         # price
         price_block = product.find("p", {"class": "price"})
         price_with_currency = price_block(text=True)
         price = price_with_currency[0].replace(" €", "")
         # print("Price:  ", price)
-        data = [product_url, price, image, icon]
+        data = [full_name, price, product_url, image, icon]
         # print(data)
-        with open('price_analyzer/products.json','r+') as file:
-            json.dump(data_array, file, indent = 4)
         data_array.append(data)
+    with open('price_analyzer/products.json','r+') as file:
+        json.dump(data_array, file, indent = 5)
 
 # paginator check
 def paginator(super_link,page,soup):
