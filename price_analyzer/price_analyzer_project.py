@@ -9,8 +9,18 @@ import webbrowser
 from PIL import ImageTk, Image
 import requests
 from io import BytesIO
+import logging
 
 
+# LOG
+logger = logging.getLogger(__name__)
+logger_file = logging.FileHandler('price_analyzer/info.log')
+logger.addHandler(logger_file)
+logger.setLevel(logging.INFO)
+logger_formater = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(module)s:%(lineno)s:%(message)s')
+logger_file.setFormatter(logger_formater)
+
+# GUI
 engine = create_engine('sqlite:///price_analyzer/search_history.db')
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -30,7 +40,7 @@ def refresh():
         tree_price = session.query(PriceAnalyzer.sql_price).filter(PriceAnalyzer.id == single_read).first()
         tree_url = session.query(PriceAnalyzer.sql_url).filter(PriceAnalyzer.id == single_read).first()
         tree_time = session.query(PriceAnalyzer.sql_time).filter(PriceAnalyzer.id == single_read).first()
-        tree.insert('', 'end', text="", values= (single_read, tree_input[0], tree_name[0],tree_price[0], tree_url[0], tree_time[0],))
+        tree.insert('', 'end', text="", values=(single_read, tree_input[0], tree_name[0],tree_price[0], tree_url[0], tree_time[0],))
 
 def search_button():
     name_label['text']=f"Name: "
@@ -41,7 +51,10 @@ def search_button():
         controller.flush_json()
         search_model = input_entry.get()
         kaina24.model_search(search_model)
-        final_product = controller.searcher()
+        try:
+            final_product = controller.searcher()
+        except:
+            logger.info("Somethin is wrong with .json file or bad .json format")
         lowest_name = final_product[0]
         lowest_price = final_product[1]
         lowest_url = final_product[2]
@@ -59,6 +72,7 @@ def search_button():
             image_label.image=img
         except ValueError:
             image_label["text"]=f"No image"
+            logger.info("No image")
         try:
             ico_response = requests.get(lowest_ico)
             ico_data = ico_response.content
@@ -67,8 +81,10 @@ def search_button():
             ico_label.image=ico
         except ValueError:
             ico_label["text"]=f"No icon"
+            logger.info("No image")
     except ValueError:
         info_label["text"]=f"No data received on input: {input_entry.get()}"
+        logger.info("No text was added")
 
 def remove_id():
     try:
@@ -86,6 +102,7 @@ def remove_id():
     except AttributeError:
         print(remove_entry.get())
         info_label["text"]=f"There's no such ID: {remove_entry.get()}"
+        logger.info("There was no such ID")
 
 def add_to_sql():
     try:
@@ -99,7 +116,7 @@ def add_to_sql():
         input_entry.delete(0, 'end')
         refresh()
     except ValueError:
-        print("NONO")
+        logger.info("Nothing to add")
 
 def open_url():
     open_link = url_label.cget("text")[5:][:-2]
