@@ -12,6 +12,6 @@ kaina24.model_search(search_model)
 
 
 # 210-AWVO   u2720q
-data_received = kaina24.grab_and_scratch
+# data_received = kaina24.grab_and_scratch
 
 

@@ -42,11 +42,8 @@ def grab_and_scratch(soup):
         final_url = product_onclick[0].get("onclick")
         product_url = re.search("(?P<url>https?://[^\s]+)", final_url).group("url")
         # name
-
-        # FIX ME HERE
-
-        named_text = product_block(text=True)
-        full_name = str(named_text).replace("\"", "inch").replace("<b>", "").replace("</b>", "").replace("/", "|")
+        named_text = product_onclick[0].get("title").replace("\"", "inch").replace("/", "|")
+        full_name = named_text
         # print("Product URL: ", product_url)
         # price
         price_block = product.find("p", {"class": "price"})
@@ -62,7 +59,6 @@ def grab_and_scratch(soup):
 # paginator check
 def paginator(super_link,page,soup):
     while True:
-        time.sleep(2)
         paginator_link = super_link + "&page=" + str(page)
         paginator_check = soup.find("a", {"href": paginator_link })
         request_data = requests.get(paginator_link, headers={"User-Agent": "Mozilla/5.0"})
@@ -71,10 +67,12 @@ def paginator(super_link,page,soup):
         grab_and_scratch(soup)
         if paginator_check != None:
             print("\nCONTINUE linkas egzistuoja: ", paginator_link)
+            time.sleep(7)
             continue
         else:
             print("\nBREAK nera linko: ", paginator_link)
             break
+    
 
 # search_model = str(input("modelio numeris: "))
 # model_search(search_model)
