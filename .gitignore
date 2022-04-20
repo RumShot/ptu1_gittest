@@ -2,5 +2,6 @@ venv/
 **/__pycache__/**
 /__pycache__/**
 /__pycache__/
+price_analyzer/__pycache__/
 unit_test_paskaita/
 price_analyzer/products.json
