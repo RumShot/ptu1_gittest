@@ -22,6 +22,7 @@ class PriceAnalyzer(Base):
         self.sql_url = sql_url
 
     def __repr__(self):
+        # return self.id , self.sql_input, self.sql_name, self.sql_price, self.sql_url, self.sql_time
         return f"{self.id} {self.sql_input} {self.sql_name} {self.sql_price} {self.sql_url} {self.sql_time}"
 
 Base.metadata.create_all(engine)

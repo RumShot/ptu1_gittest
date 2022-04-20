@@ -3,14 +3,12 @@ import kaina24
 import sql_data_base as sql
 
 # overwrite file
-# with open('price_analyzer/products.json','w+') as file:
-#     print("file created")
+with open('price_analyzer/products.json','w+') as file:
+    print("file created")
 
 sql.PriceAnalyzer
 
 def searcher():
-    # kaina24.model_search(search_model)
-
     with open('price_analyzer/products.json', 'r') as myfile:
         data=myfile.read()
         obj = json.loads(data)
@@ -30,8 +28,8 @@ def searcher():
     return final_product
     # print("LOWEST PRICE: ", final_product)
 
-if __name__ == '__main__':
-    searcher() 
+# if __name__ == '__main__':
+#     searcher() 
 
 # 210-AWVO   u2720q
 

@@ -37,20 +37,28 @@ def grab_and_scratch(soup):
             icon = "None"
         # print("Icon URL: ", icon)
         # url
-        product_block = product.find("p", {"class": "name"})
-        product_onclick = product_block("a", {"rel": "nofollow"})
-        final_url = product_onclick[0].get("onclick")
-        product_url = re.search("(?P<url>https?://[^\s]+)", final_url).group("url")
+        try:
+            product_block = product.find("p", {"class": "name"})
+            product_onclick = product_block("a", {"rel": "nofollow"})
+            final_url = product_onclick[0].get("onclick")
+            product_url = re.search("(?P<url>https?://[^\s]+)", final_url).group("url")
+        except TypeError:
+            product_url = "None"
         # name
-        named_text = product_onclick[0].get("title").replace("\"", "inch").replace("/", "|")
-        full_name = named_text
+        try:
+            named_text = product_onclick[0].get("title").replace("\"", "inch").replace("/", "|")
+        except TypeError:
+            named_text = "None"
         # print("Product URL: ", product_url)
         # price
-        price_block = product.find("p", {"class": "price"})
-        price_with_currency = price_block(text=True)
-        price = price_with_currency[0].replace(" €", "")
-        # print("Price:  ", price)
-        data = [full_name, price, product_url, image, icon]
+        try:
+            price_block = product.find("p", {"class": "price"})
+            price_with_currency = price_block(text=True)
+            price = price_with_currency[0].replace(" €", "")
+            # print("Price:  ", price)
+        except TypeError:
+            price = "None"
+        data = [named_text, price, product_url, image, icon]
         # print(data)
         data_array.append(data)
     with open('price_analyzer/products.json','r+') as file:
