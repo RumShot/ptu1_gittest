@@ -17,7 +17,7 @@ session = Session()
 
 window = Tk()
 window.title('Lowest Price Analyzer')
-window.geometry("1390x450")
+window.geometry("1390x600")
 
 def refresh():
     children = tree.get_children()
@@ -32,9 +32,12 @@ def refresh():
         tree_time = session.query(PriceAnalyzer.sql_time).filter(PriceAnalyzer.id == single_read).first()
         tree.insert('', 'end', text="", values= (single_read, tree_input[0], tree_name[0],tree_price[0], tree_url[0], tree_time[0],))
 
-# 210-AWVO   u2720q
 def search_button():
+    name_label['text']=f"Name: "
+    price_label['text']=f"Lowest price: "
+    url_label['text']=f"URL: "
     try:
+        info_label["text"]=f"Searching please wait while we display results"
         controller.flush_json()
         search_model = input_entry.get()
         kaina24.model_search(search_model)
@@ -47,25 +50,50 @@ def search_button():
         name_label['text']=f"Name: {lowest_name}"
         price_label['text']=f"Lowest price:  {lowest_price}"
         url_label['text']=f"URL: {lowest_url}"
+        info_label["text"]=f"Search complete"
+        try:
+            img_response = requests.get(lowest_img)
+            img_data = img_response.content
+            img = ImageTk.PhotoImage(Image.open(BytesIO(img_data)))
+            image_label.configure(image=img)
+            image_label.image=img
+        except ValueError:
+            image_label["text"]=f"No image"
+        try:
+            ico_response = requests.get(lowest_ico)
+            ico_data = ico_response.content
+            ico = ImageTk.PhotoImage(Image.open(BytesIO(ico_data)))
+            ico_label.configure(image=ico)
+            ico_label.image=ico
+        except ValueError:
+            ico_label["text"]=f"No icon"
     except ValueError:
-        info_label['text']=f"No data received on input: {input_entry.get()}"
+        info_label["text"]=f"No data received on input: {input_entry.get()}"
 
 def remove_id():
-    selected_id = remove_entry.get()
-    if selected_id.isdigit():
-        read_data = session.query(PriceAnalyzer).get(selected_id)
-        session.delete(read_data)
-        remove_entry.delete(0, 'end')
-        session.commit()
-        refresh()
+    try:
+        selected_id = remove_entry.get()
+        if selected_id.isdigit():
+            read_data = session.query(PriceAnalyzer).get(selected_id)
+            session.delete(read_data)
+            remove_entry.delete(0, 'end')
+            session.commit()
+            refresh()
+            info_label["text"]=f"ID: {remove_entry.get()} was removed"
+            remove_entry['text'] = ""
+        else:
+            info_label["text"]=f"Please insert digit"
+    except AttributeError:
+        print(remove_entry.get())
+        info_label["text"]=f"There's no such ID: {remove_entry.get()}"
 
 def add_to_sql():
     try:
         from_input = input_entry.get()
         from_name = name_label.cget("text")[6:]
         from_price = price_label.cget("text")[15:]
-        from_url = url_label.cget("text")[5:]
-        to_sql_data = PriceAnalyzer(from_input, from_name, from_price, from_url)
+        from_url = url_label.cget("text")[5:][:-2]
+        to_sql_data = PriceAnalyzer(from_input, from_name, from_price, from_url,)
         session.add(to_sql_data)
         session.commit()
         input_entry.delete(0, 'end')
@@ -78,18 +106,21 @@ def open_url():
     webbrowser.open_new_tab(open_link)
 
 def selectItem(a):
-    selected_input_entry.delete(0, 'end')
-    selected_name_entry.delete(0, 'end')
-    selected_price_entry.delete(0, 'end')
-    selected_url_entry.delete(0, 'end')
-    selected_time_entry.delete(0, 'end')
-    curItem = tree.focus()
-    selected_data = tree.item(curItem)
-    selected_input_entry.insert(0,selected_data["values"][1])
-    selected_name_entry.insert(0,selected_data["values"][2])
-    selected_price_entry.insert(0,selected_data["values"][3])
-    selected_url_entry.insert(0,selected_data["values"][4])
-    selected_time_entry.insert(0,selected_data["values"][5])
+    try:
+        selected_input_entry.delete(0, 'end')
+        selected_name_entry.delete(0, 'end')
+        selected_price_entry.delete(0, 'end')
+        selected_url_entry.delete(0, 'end')
+        selected_time_entry.delete(0, 'end')
+        curItem = tree.focus()
+        selected_data = tree.item(curItem)
+        selected_input_entry.insert(0,selected_data["values"][1])
+        selected_name_entry.insert(0,selected_data["values"][2])
+        selected_price_entry.insert(0,selected_data["values"][3])
+        selected_url_entry.insert(0,selected_data["values"][4])
+        selected_time_entry.insert(0,selected_data["values"][5])
+    except IndexError:
+        print("first always a miss")
 
 tree_style = ttk.Style()
 tree_style.theme_use('clam')
@@ -102,7 +133,9 @@ input_entry = Entry(window, width= 30)
 search_btn = Button(width = 8, text="Search")
 search_btn.bind("<Button-1>", lambda event: search_button())
 name_label = Label(text="Name: ", padx= 10, wraplength=650)
-image_label = Label(window)
+# images insert
+image_label = Label(window, text="")
+ico_label = Label(window, text="")
 # row3
 empty_row2 = Label(text="")
 remove_label = Label(text="ID")
@@ -117,7 +150,7 @@ add_btn.bind("<Button-1>", lambda event:add_to_sql())
 url_label = Label(text="URL: ", padx= 10, wraplength=650)
 url_label.bind("<Button-1>", lambda event:open_url())
 # row5
-info_label = Label(text="")
+info_label = Label(text="", fg= "red", font=25)
 # row6
 selected_input_entry= Entry(window, width= 30)
 selected_name_entry = Entry(window, width= 30)
@@ -140,32 +173,35 @@ tree.heading("# 5", text="URL")
 tree.column("# 6", anchor=CENTER)
 tree.heading("# 6", text="Created")
 # ------------------------
-# row2
+# row2 config
 empty_row.grid(row=1, column=1)
-input_label.grid(row=2, column=1, sticky=W)
-input_entry.grid(row=2, column=3)
-search_btn.grid(row=2, column=4, sticky=E)
-name_label.grid(row=2, column=5, sticky=W)
-# row3
+input_label.grid(row=2, column=1, sticky=E)
+input_entry.grid(row=2, column=2)
+search_btn.grid(row=2, column=3)
+name_label.grid(row=2, column=4, sticky=W)
+
+image_label.grid(rowspan=4, column=6)
+ico_label.grid(row=7, column=6)
+# row3 config
 empty_row2.grid(row=3, column=1)
-remove_label.grid(row=4, column=1)
-remove_entry.grid(row=4, column=3)
-remove_btn.grid(row=4, column=4, sticky=E)
-price_label.grid(row=4, column=5, sticky=W)
-# row4
+remove_label.grid(row=4, column=1, sticky=E)
+remove_entry.grid(row=4, column=2)
+remove_btn.grid(row=4, column=3)
+price_label.grid(row=4, column=4, sticky=W)
+# row4 config
 empty_row3.grid(row=5, column=2)
-add_btn.grid(row=6, column=4, sticky=E)
-url_label.grid(row=6, column=5, sticky=W)
-# row5
-info_label.grid(row=7, column=5)
-# row6
+add_btn.grid(row=6, column=3)
+url_label.grid(row=6, column=4, sticky=W)
+# row5 config
+info_label.grid(row=7, columnspan=5)
+# row6 config
 selected_input_entry.grid(row=8, column=1)
 selected_name_entry.grid(row=8, column=2)
 selected_price_entry.grid(row=8, column=3)
-selected_url_entry.grid(row=8, column=4)
-selected_time_entry.grid(row=8, column=5)
-# row7
-tree.grid(row=9, columnspan=100,sticky=E+W)
+selected_url_entry.grid(row=9, column=1)
+selected_time_entry.grid(row=9, column=3)
+# row7 config
+tree.grid(row=10, columnspan=100,sticky=E+W)
 
 refresh()
 window.mainloop()
