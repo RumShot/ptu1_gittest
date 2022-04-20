@@ -1,10 +1,11 @@
 import json
-import kaina24
 import sql_data_base as sql
 
+
 # overwrite file
-with open('price_analyzer/products.json','w+') as file:
-    print("file created")
+def flush_json():
+    with open('price_analyzer/products.json','w+') as file:
+        print("file created")
 
 sql.PriceAnalyzer
 
@@ -26,13 +27,3 @@ def searcher():
         else:
             continue
     return final_product
-    # print("LOWEST PRICE: ", final_product)
-
-# if __name__ == '__main__':
-#     searcher() 
-
-# 210-AWVO   u2720q
-
-# search_model = str(input("modelio numeris: "))
-# searcher(search_model)
-# searcher()

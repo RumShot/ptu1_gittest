@@ -14,12 +14,10 @@ def model_search(search_model):
     page = 2
     paginator(super_link,page,soup)
 
-# 210-AWVO   u2720q
 def grab_and_scratch(soup):
     data_array = []
     main_content = soup.findAll("div", {"class": "product-item-h"})
     for product in main_content:
-        # print("------------")
         # image
         try:
             img_block = product.find("a", {"class": "image-wrap"})
@@ -27,7 +25,6 @@ def grab_and_scratch(soup):
             image = img_url["data-src"]
         except TypeError:
             image = "None"
-        # print("Image URL: ", image)
         # icon
         try:
             icon_block = product.find("p", {"class": "shop"})
@@ -35,7 +32,6 @@ def grab_and_scratch(soup):
             icon = icon_url["data-src"]
         except TypeError:
             icon = "None"
-        # print("Icon URL: ", icon)
         # url
         try:
             product_block = product.find("p", {"class": "name"})
@@ -49,17 +45,14 @@ def grab_and_scratch(soup):
             named_text = product_onclick[0].get("title").replace("\"", "inch").replace("/", "|")
         except TypeError:
             named_text = "None"
-        # print("Product URL: ", product_url)
         # price
         try:
             price_block = product.find("p", {"class": "price"})
             price_with_currency = price_block(text=True)
             price = price_with_currency[0].replace(" €", "")
-            # print("Price:  ", price)
         except TypeError:
             price = "None"
         data = [named_text, price, product_url, image, icon]
-        # print(data)
         data_array.append(data)
     with open('price_analyzer/products.json','r+') as file:
         json.dump(data_array, file, indent = 5)
@@ -81,6 +74,3 @@ def paginator(super_link,page,soup):
             print("\nBREAK nera linko: ", paginator_link)
             break
     
-
-# search_model = str(input("modelio numeris: "))
-# model_search(search_model)

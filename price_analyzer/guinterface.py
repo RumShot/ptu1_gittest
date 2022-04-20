@@ -6,11 +6,18 @@ from sql_data_base import PriceAnalyzer
 import controller
 import kaina24
 import webbrowser
+from PIL import ImageTk, Image
+import requests
+from io import BytesIO
 
 
 engine = create_engine('sqlite:///price_analyzer/search_history.db')
 Session = sessionmaker(bind=engine)
 session = Session()
+
+window = Tk()
+window.title('Lowest Price Analyzer')
+window.geometry("1390x450")
 
 def refresh():
     children = tree.get_children()
@@ -27,18 +34,21 @@ def refresh():
 
 # 210-AWVO   u2720q
 def search_button():
-    search_model = input_entry.get()
-    print(search_model)
-    kaina24.model_search(search_model)
-    final_product = controller.searcher()
-    lowest_name = final_product[0]
-    lowest_price = final_product[1]
-    lowest_url = final_product[2]
-    lowest_img = final_product[3]
-    lowest_ico = final_product[4]
-    name_label['text']=f"Name: {lowest_name}"
-    price_label['text']=f"Lowest price:  {lowest_price}"
-    url_label['text']=f"URL: {lowest_url}"
+    try:
+        controller.flush_json()
+        search_model = input_entry.get()
+        kaina24.model_search(search_model)
+        final_product = controller.searcher()
+        lowest_name = final_product[0]
+        lowest_price = final_product[1]
+        lowest_url = final_product[2]
+        lowest_img = final_product[3]
+        lowest_ico = final_product[4]
+        name_label['text']=f"Name: {lowest_name}"
+        price_label['text']=f"Lowest price:  {lowest_price}"
+        url_label['text']=f"URL: {lowest_url}"
+    except ValueError:
+        info_label['text']=f"No data received on input: {input_entry.get()}"
 
 def remove_id():
     selected_id = remove_entry.get()
@@ -50,23 +60,36 @@ def remove_id():
         refresh()
 
 def add_to_sql():
-    from_input = input_entry.get()
-    from_name = name_label.cget("text")[6:]
-    from_price = price_label.cget("text")[15:]
-    from_url = url_label.cget("text")[5:]
-    to_sql_data = PriceAnalyzer(from_input, from_name, from_price, from_url)
-    session.add(to_sql_data)
-    session.commit()
-    input_entry.delete(0, 'end')
-    refresh()
+    try:
+        from_input = input_entry.get()
+        from_name = name_label.cget("text")[6:]
+        from_price = price_label.cget("text")[15:]
+        from_url = url_label.cget("text")[5:]
+        to_sql_data = PriceAnalyzer(from_input, from_name, from_price, from_url)
+        session.add(to_sql_data)
+        session.commit()
+        input_entry.delete(0, 'end')
+        refresh()
+    except ValueError:
+        print("NONO")
 
 def open_url():
     open_link = url_label.cget("text")[5:][:-2]
     webbrowser.open_new_tab(open_link)
 
-window = Tk()
-window.title('Lowest Price Analyzer')
-window.geometry("1210x450")
+def selectItem(a):
+    selected_input_entry.delete(0, 'end')
+    selected_name_entry.delete(0, 'end')
+    selected_price_entry.delete(0, 'end')
+    selected_url_entry.delete(0, 'end')
+    selected_time_entry.delete(0, 'end')
+    curItem = tree.focus()
+    selected_data = tree.item(curItem)
+    selected_input_entry.insert(0,selected_data["values"][1])
+    selected_name_entry.insert(0,selected_data["values"][2])
+    selected_price_entry.insert(0,selected_data["values"][3])
+    selected_url_entry.insert(0,selected_data["values"][4])
+    selected_time_entry.insert(0,selected_data["values"][5])
 
 tree_style = ttk.Style()
 tree_style.theme_use('clam')
@@ -78,7 +101,8 @@ input_label = Label(text="Input Model")
 input_entry = Entry(window, width= 30)
 search_btn = Button(width = 8, text="Search")
 search_btn.bind("<Button-1>", lambda event: search_button())
-name_label = Label(text="Name: ", padx= 10)
+name_label = Label(text="Name: ", padx= 10, wraplength=650)
+image_label = Label(window)
 # row3
 empty_row2 = Label(text="")
 remove_label = Label(text="ID")
@@ -90,27 +114,31 @@ price_label = Label(text="Lowest price: ", padx= 10)
 empty_row3 = Label(text="")
 add_btn = Button(width = 8, text="Add")
 add_btn.bind("<Button-1>", lambda event:add_to_sql())
-url_label = Label(text="URL: ", padx= 10, )
+url_label = Label(text="URL: ", padx= 10, wraplength=650)
 url_label.bind("<Button-1>", lambda event:open_url())
 # row5
-info_label = Label(text="info")
-# row6 tree
-tree = ttk.Treeview(window, column=("c1", "c2", "c3", "c4", "c5", "c6"), show='headings', height=20, selectmode='extended')
-
+info_label = Label(text="")
+# row6
+selected_input_entry= Entry(window, width= 30)
+selected_name_entry = Entry(window, width= 30)
+selected_price_entry = Entry(window, width= 30)
+selected_url_entry= Entry(window, width= 30)
+selected_time_entry = Entry(window, width= 30)
+# row7 tree
+tree = ttk.Treeview(window, column=("c1", "c2", "c3", "c4", "c5", "c6"), show='headings', height=20, selectmode='browse')
+tree.bind("<Button-1>", selectItem)
 tree.column("# 1", anchor=CENTER, width=4)
 tree.heading("# 1", text="ID")
 tree.column("# 2", anchor=W)
 tree.heading("# 2", text="Input")
-tree.column("# 3", anchor=W, width=350)
+tree.column("# 3", anchor=W, width=450)
 tree.heading("# 3", text="Name")
 tree.column("# 4", anchor=CENTER, width=80)
 tree.heading("# 4", text="Price")
-tree.column("# 5", anchor=W, width=350)
+tree.column("# 5", anchor=W, width=450)
 tree.heading("# 5", text="URL")
 tree.column("# 6", anchor=CENTER)
 tree.heading("# 6", text="Created")
-# tree data insert
-
 # ------------------------
 # row2
 empty_row.grid(row=1, column=1)
@@ -131,7 +159,13 @@ url_label.grid(row=6, column=5, sticky=W)
 # row5
 info_label.grid(row=7, column=5)
 # row6
-tree.grid(row=8, columnspan=20,sticky=E+W)
+selected_input_entry.grid(row=8, column=1)
+selected_name_entry.grid(row=8, column=2)
+selected_price_entry.grid(row=8, column=3)
+selected_url_entry.grid(row=8, column=4)
+selected_time_entry.grid(row=8, column=5)
+# row7
+tree.grid(row=9, columnspan=100,sticky=E+W)
 
 refresh()
 window.mainloop()
