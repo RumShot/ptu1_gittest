@@ -5,3 +5,8 @@ venv/
 price_analyzer/__pycache__/
 unit_test_paskaita/
 price_analyzer/products.json
+build/
+price_analyzer_project.spec
+info.log
+note.ico
+search_history.db
