@@ -4,9 +4,9 @@ venv/
 /__pycache__/
 unit_test_paskaita/
 build/
+dist/products.json
 dist/info.log
 dist/search_history.db
-dist/products.json
 info.log
 note.ico
 search_history.db
