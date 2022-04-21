@@ -1,7 +1,6 @@
 import json
 
 
-# overwrite file
 def flush_json():
     with open('products.json','w+') as file:
         print("file created")

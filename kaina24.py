@@ -57,7 +57,6 @@ def grab_and_scratch(soup):
     with open('products.json','r+') as file:
         json.dump(data_array, file, indent = 5)
 
-# paginator check
 def paginator(super_link,page,soup):
     while True:
         paginator_link = super_link + "&page=" + str(page)
