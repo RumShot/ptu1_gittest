@@ -10,4 +10,5 @@ Projectfiles --> [
     kaina24.py
     controller.py
     ]
+    
 Project .exe file --> dist/price_analyzer_project.exe
