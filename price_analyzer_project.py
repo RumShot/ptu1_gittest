@@ -106,7 +106,7 @@ def remove_id():
             remove_entry['text'] = ""
         else:
             info_label["text"]=f"Please insert digit"
-    except AttributeError:
+    except:
         print(remove_entry.get())
         info_label["text"]=f"There's no such ID: {remove_entry.get()}"
         logger.info("There was no such ID")
