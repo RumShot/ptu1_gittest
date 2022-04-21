@@ -59,7 +59,7 @@ def search_button():
         search_model = input_entry.get()
         kaina24.model_search(search_model)
         try:
-            final_product = controller.searcher()
+            final_product = controller.search_lowest_price()
         except:
             logger.info("Somethin is wrong with .json file or bad .json format")
         lowest_name = final_product[0]
@@ -129,7 +129,7 @@ def open_url():
     open_link = url_label.cget("text")[5:][:-2]
     webbrowser.open_new_tab(open_link)
 
-def selectItem(a):
+def select_item_from_list(a):
     try:
         selected_input_entry.delete(0, 'end')
         selected_name_entry.delete(0, 'end')
@@ -183,7 +183,7 @@ selected_url_entry= Entry(window, width= 30)
 selected_time_entry = Entry(window, width= 30)
 # row7 tree
 tree = ttk.Treeview(window, column=("c1", "c2", "c3", "c4", "c5", "c6"), show='headings', height=20, selectmode='browse')
-tree.bind("<Button-1>", selectItem)
+tree.bind("<Button-1>", select_item_from_list)
 tree.column("# 1", anchor=CENTER, width=4)
 tree.heading("# 1", text="ID")
 tree.column("# 2", anchor=W)
