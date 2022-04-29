@@ -61,15 +61,21 @@ def paginator(super_link,page,soup):
     while True:
         paginator_link = super_link + "&page=" + str(page)
         paginator_check = soup.find("a", {"href": paginator_link })
+        too_long_paginator = soup.find("a", {"class": "to-last"})
+        print("-----------", too_long_paginator)
         request_data = requests.get(paginator_link, headers={"User-Agent": "Mozilla/5.0"})
         soup = BF(request_data.text, "html.parser")
         page += 1
+        if too_long_paginator != None:
+            print("Too much paginators, it will take too long")
+            break
         grab_and_scratch(soup)
         if paginator_check != None:
             print("\nCONTINUE linkas egzistuoja: ", paginator_link)
-            time.sleep(7)
+            time.sleep(5)
             continue
         else:
             print("\nBREAK nera linko: ", paginator_link)
             break
+    
     

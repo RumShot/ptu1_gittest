@@ -60,16 +60,21 @@ def search_button():
         kaina24.model_search(search_model)
         try:
             final_product = controller.search_lowest_price()
-        except:
-            logger.info("Somethin is wrong with .json file or bad .json format")
+        except UnboundLocalError:
+            logger.info("No data in .json | .json file or bad .json format")
         lowest_name = final_product[0]
         lowest_price = final_product[1]
-        lowest_url = final_product[2]
+        lowest_url = final_product[2][:-2]
+        print(lowest_url)
+        print(lowest_url)
+        print(lowest_url)
         lowest_img = final_product[3]
         lowest_ico = final_product[4]
         name_label['text']=f"Name: {lowest_name}"
         price_label['text']=f"Lowest price:  {lowest_price}"
         url_label['text']=f"URL: {lowest_url}"
+        # url_label.bind("<Enter>", lambda e, text_on_hover=f"URL: {lowest_url}": e.widget.config(fg="blue"))
+        # url_label.bind("<Leave>", lambda e, text_out_hover=f"URL: {lowest_url}": e.widget.config(fg="blue"))
         info_label["text"]=f"Search complete"
         try:
             img_response = requests.get(lowest_img)
@@ -90,7 +95,7 @@ def search_button():
             ico_label["text"]=f"No icon"
             logger.info("No image")
     except ValueError:
-        info_label["text"]=f"No data received on input: {input_entry.get()}"
+        info_label["text"]=f"With provided info it ill take too long, specify more parameters"
         logger.info("No text was added")
 
 def remove_id():
@@ -126,7 +131,7 @@ def add_to_sql():
         logger.info("Nothing to add")
 
 def open_url():
-    open_link = url_label.cget("text")[5:][:-2]
+    open_link = url_label.cget("text")[5:]
     webbrowser.open_new_tab(open_link)
 
 def select_item_from_list(a):
@@ -171,7 +176,7 @@ price_label = Label(text="Lowest price: ", padx= 10)
 empty_row3 = Label(text="")
 add_btn = Button(width = 8, text="Add")
 add_btn.bind("<Button-1>", lambda event:add_to_sql())
-url_label = Label(text="URL: ", padx= 10, wraplength=650)
+url_label = Label(text="URL: ", padx= 10, wraplength=650, fg="blue")
 url_label.bind("<Button-1>", lambda event:open_url())
 # row5
 info_label = Label(text="", fg= "red", font=25)
@@ -204,8 +209,8 @@ input_entry.grid(row=2, column=2)
 search_btn.grid(row=2, column=3)
 name_label.grid(row=2, column=4, sticky=W)
 
-image_label.grid(rowspan=4, column=6)
-ico_label.grid(row=7, column=6)
+image_label.grid(rowspan=3, column=9)
+ico_label.grid(row=7, column=9)
 # row3 config
 empty_row2.grid(row=3, column=1)
 remove_label.grid(row=4, column=1, sticky=E)

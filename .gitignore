@@ -2,7 +2,6 @@ venv/
 **/__pycache__/**
 /__pycache__/**
 /__pycache__/
-unit_test_paskaita/
 build/
 dist/products.json
 dist/info.log
@@ -13,4 +12,3 @@ note.ico
 search_history.db
 unit_test_paskaita
 price_analyzer_project.spec
-unit_test_uzd
