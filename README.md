@@ -6,7 +6,7 @@ Price scrapper of cheapest equipment script can find from kaina24 ebsite with po
 
 Usage: fastest way to get prices is to search model number of equipment 
 
-![alt text](https://github.com/RumShot/ptu1_price_scrapper/blob/example.png?raw=true)
+<img src="https://github.com/RumShot/ptu1_price_scrapper/blob/main/blob/example.png" alt="My cool logo"/>
 
 Projectfiles --> [ price_analyzer_project.py, sql_data_base.py, kaina24.py, controller.py ]
 
